@@ -1,0 +1,55 @@
+{
+  "name": "MAC Processor Pro",
+  "short_name": "MAC Processor",
+  "description": "Procesador de direcciones MAC - Cambia 1, 2 o 3 últimos dígitos",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#667eea",
+  "background_color": "#667eea",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity"],
+  "lang": "es",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Procesar nueva MAC",
+      "short_name": "Nueva MAC",
+      "description": "Abrir procesador de MAC",
+      "url": "./"
+    },
+    {
+      "name": "Cambiar 1 dígito",
+      "short_name": "1 Dígito",
+      "description": "Cambiar último dígito de MAC",
+      "url": "./?digits=1"
+    },
+    {
+      "name": "Cambiar 2 dígitos",
+      "short_name": "2 Dígitos",
+      "description": "Cambiar últimos 2 dígitos de MAC",
+      "url": "./?digits=2"
+    },
+    {
+      "name": "Cambiar 3 dígitos",
+      "short_name": "3 Dígitos",
+      "description": "Cambiar últimos 3 dígitos de MAC",
+      "url": "./?digits=3"
+    }
+  ]
+}
