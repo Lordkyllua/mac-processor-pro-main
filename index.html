@@ -112,6 +112,7 @@
             align-items: center;
             gap: 8px;
             font-size: 14px;
+            transition: background 0.3s;
         }
 
         .theme-btn:hover, .stats-btn:hover {
@@ -139,6 +140,7 @@
             font-family: 'Courier New', monospace;
             background: var(--surface);
             color: var(--dark);
+            transition: border-color 0.3s;
         }
 
         .input-group input:focus {
@@ -162,11 +164,16 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            transition: background 0.3s;
+            transition: background 0.3s, transform 0.2s;
         }
 
         .btn:hover {
             background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
 
         .btn-success {
@@ -188,6 +195,18 @@
             border-radius: var(--radius);
             margin-bottom: 15px;
             display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .alert.show {
@@ -214,6 +233,7 @@
             margin-top: 20px;
             border-left: 4px solid var(--success);
             display: none;
+            animation: slideIn 0.3s ease-out;
         }
 
         .result.show {
@@ -231,6 +251,7 @@
             border-radius: 8px;
             border: 2px dashed var(--gray-200);
             word-break: break-all;
+            user-select: all;
         }
 
         /* ===== ESTADO ===== */
@@ -242,6 +263,12 @@
             padding: 12px;
             background: var(--light);
             border-radius: var(--radius);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         /* ===== FOOTER ===== */
@@ -258,12 +285,15 @@
             display: flex;
             justify-content: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         .footer-links a {
             color: white;
             text-decoration: none;
             opacity: 0.7;
+            cursor: pointer;
+            transition: opacity 0.3s;
         }
 
         .footer-links a:hover {
@@ -288,6 +318,16 @@
             .result-code {
                 font-size: 18px;
                 padding: 12px;
+            }
+
+            .controls-top {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .theme-btn, .stats-btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -358,17 +398,15 @@
         <div class="footer">
             <p>MAC Processor Pro &copy; 2025</p>
             <div class="footer-links">
-                <a href="javascript:void(0)" id="shortcutsBtn">Atajos</a>
-                <a href="javascript:void(0)" id="aboutBtn">Acerca de</a>
-                <a href="javascript:void(0)" id="clearBtn">Limpiar</a>
+                <a id="shortcutsBtn">Atajos</a>
+                <a id="aboutBtn">Acerca de</a>
+                <a id="clearBtn">Limpiar</a>
             </div>
         </div>
     </div>
 
     <script>
-        // ===== VERSIÓN SIMPLE Y FUNCIONAL =====
-        
-        // ===== CONFIGURACIÓN =====
+        // ===== VERSIÓN =====
         const APP_VERSION = '3.2';
         
         // ===== FUNCIONES BÁSICAS =====
@@ -471,7 +509,7 @@
             // Service Worker
             if ('serviceWorker' in navigator) {
                 const swPath = window.location.hostname.includes('github.io') 
-                    ? '/mac-processor-pro/sw.js' 
+                    ? '/mac-processor-pro-main/sw.js' 
                     : 'sw.js';
                 
                 navigator.serviceWorker.register(swPath)
@@ -480,7 +518,7 @@
                     })
                     .catch(err => {
                         console.error('Error SW:', err);
-                        updateStatus('Error Service Worker');
+                        updateStatus('Service Worker offline');
                     });
             }
             
@@ -534,7 +572,7 @@
             }
         }
         
-        // ===== ESTADÍSTICAS SIMPLES =====
+        // ===== ESTADÍSTICAS =====
         function getStats() {
             const processes = parseInt(localStorage.getItem('totalProcesses') || '0');
             const copies = parseInt(localStorage.getItem('totalCopies') || '0');
@@ -555,7 +593,7 @@
             
             alert(`📊 Estadísticas de uso:\n\n` +
                   `Procesamientos: ${stats.processes}\n` +
-                  `Copias: ${stats.copies}\n` +
+                  `Copias realizadas: ${stats.copies}\n` +
                   `Errores: ${stats.errors}\n` +
                   `Tasa de éxito: ${stats.successRate}%\n\n` +
                   `Datos guardados localmente.`);
@@ -589,41 +627,15 @@
             // Validaciones
             if (!mac) {
                 showAlert('error', 'Por favor ingresa una dirección MAC');
+                recordError();
                 return;
             }
 
             if (!digit) {
                 showAlert('error', 'Por favor ingresa el último dígito');
+                recordError();
                 return;
             }
 
             if (!/^[0-9A-F]$/.test(digit)) {
-                showAlert('error', 'El último dígito debe ser hexadecimal (0-9, A-F)');
-                return;
-            }
-
-            try {
-                const resultado = procesarMAC(mac, digit);
-                showResult(resultado);
-                showAlert('success', 'MAC procesada correctamente');
-                recordProcess();
-            } catch (error) {
-                showAlert('error', 'Error: ' + error.message);
-                recordError();
-            }
-        }
-        
-        async function copyResult() {
-            const resultado = document.getElementById('resultCode').textContent;
-            
-            if (!resultado) {
-                showAlert('error', 'No hay resultado para copiar');
-                return;
-            }
-            
-            try {
-                if (navigator.clipboard && window.isSecureContext) {
-                    await navigator.clipboard.writeText(resultado);
-                } else {
-                    // Fallback para navegadores antiguos
-     
+                showAlert('error', 'El 
